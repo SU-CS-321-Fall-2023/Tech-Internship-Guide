@@ -1,6 +1,82 @@
 const express = require('express')
 const router = express.Router()
 
+const emailSchema = require('../models/EmailVerification')
+
+const userModel = require('../models/User')
+const blockModel = require('../models/BlockData')
+const faqModel = require('../models/FreqAQ')
+const storyModel = require('../models/Stories')
+
+router.get('/users', async(req, res) => {
+    await userModel.find()
+    .then(users => res.json(users))
+    .catch(err => res.json(err))
+})
+
+router.get('/blockData', async(req, res) => {
+    await blockModel.find()
+    .then(blockData => res.json(blockData))
+    .catch(err => res.json(err))
+})
+
+router.get('/faqs', async(req, res) => {
+    await faqModel.find()
+    .then(faq => res.json(faq))
+    .catch(err => res.json(err))
+})
+
+router.get('/stories', async(req, res) => {
+    await storyModel.find()
+    .then(story => res.json(story))
+    .catch(err => res.json(err))
+})
+
+router.post('/users', async(req, res) => {
+    const userExist = await userModel.where('email').equals(req.body.email)
+    const { error, } = emailSchema.validate(req.body.email);
+    if(error){
+        return res.json(error)
+    }
+    if (userExist.length){
+        return res.json({message: "User already exists"})
+    }
+
+    const user = new userModel({
+        email: req.body.email,
+        firstName: req.body.firstName,
+        password: req.body.password,
+    })
+
+    try{
+        const newUser = await user.save()
+        res.status(201).json(newUser)
+    }catch(err){
+        res.status(400).json(err)
+    }
+})
+
+router.post('/signin', async(req, res) => {
+    try{
+    const user = await userModel.where('email').equals(req.body.email)
+    if(user.length){
+        const validate = user[0]?.password === req.body.password
+        validate ? res.status(200).json({message: "Valid user", access: true}) : res.json({message: "Invalid Password", access: false})
+    }}
+    catch(err){
+        res.json(err)
+    }
+})
+
+router.patch('/favorite/:email', async(req, res) => {
+    try{
+        
+    }
+    catch(err){
+        res.json(err)
+    }
+})
+
 router.get("/api", (req, res) => {
     res.json(
         {
@@ -88,7 +164,7 @@ router.get("/block-data", (req, res) => {
     )
 })
 
-router.get("/faqs", (req, res) => {
+router.get("/faqsDeprecated", (req, res) => {
     res.json(
         [
             {"id": "1", "question": "How do I navigate the website?", "answer": "Use the main menu at the top of the page to access different sections like Classes, Projects, Resume, and more."},
@@ -105,14 +181,5 @@ router.get("/faqs", (req, res) => {
     )
 })
 
-router.get("/stories", (req, res) => {
-    res.json(
-        [
-            {"id": "1", "company": "Uber", "story": "Tella story?"},
-            {"id": "2", "company": "Zillow", "story": "Simon story?"},
-            {"id": "3", "company": "Almada", "story": "My summer internship at Almada was a transformative experience that immersed me in the technology sector. I handled customer inquiries, troubleshooting BIOS issues, and learned the value of diverse skills. Collaborating with interns, we presented on technical topics and explored AIs potential in cybersecurity. The internship broadened my web development skills and introduced me to AIs impact on network security and database organization. The supportive work environment, camaraderie, and teamwork were invaluable, emphasizing the importance of collaboration. The highlight was working on an AI system for database organization and network security. This experience enhanced my problem-solving, communication, and innovation skills, leaving me inspired for future endeavors in technology."}
-        ]
-    )
-})
 
 module.exports = router

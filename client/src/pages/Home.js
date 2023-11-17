@@ -1,14 +1,11 @@
 import React from 'react';
-import { TabGroup } from '../components/Tab';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
+import { Register } from './Register';
+import { SignIn } from './SignIn';
 
 export const Home = () => {
     return(
-        <>
-            <Navbar />
-            <TabGroup />
-            <Footer />
-        </>
+        <div className='text-white'>
+            Home Page
+        </div>
     );
 };

@@ -1,0 +1,20 @@
+GET http://localhost:4000/users
+
+###
+
+POST http://localhost:4000/users
+Content-Type: application/json
+
+{
+    "email": "b@gmail.com",
+    "firstName": "Jibola"
+}
+
+###
+POST   http://localhost:4000/signin
+Content-Type: application/json
+
+{
+    "email": "adegbolatella08@gmail.com",
+    "password": "@Hello0"
+}
