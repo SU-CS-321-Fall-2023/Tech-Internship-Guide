@@ -1,15 +1,16 @@
 require("dotenv").config()
 const express = require('express')
+const session = require('express-session')
+const mongoSession = require('connect-mongodb-session')(session)
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const router = require('./routes/router')
+const mongoose = require('mongoose')
 
 const port = process.env.PORT
 const uri = process.env.DB_CONNECTION_STRING
 
 const app = express()
-
-const mongoose = require('mongoose')
 
 const ConnectMongoDB = async() => {
   try {
@@ -22,11 +23,26 @@ const ConnectMongoDB = async() => {
 
 ConnectMongoDB()
 
+const store = new mongoSession({
+uri, collection: 'userSessions'})
+store.on('error', err => console.error(err))
+
+app.use(session({
+  secret: process.env.SECRET_STRING,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    httpOnly: true,
+  },
+  store: store,
+}))
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const corsOptions = {
-    origin: '*',
+    origin: ['*', 'http://127.0.0.1:54579'],
     credentials: true,
     optionsSuccessStatus: 200
 }

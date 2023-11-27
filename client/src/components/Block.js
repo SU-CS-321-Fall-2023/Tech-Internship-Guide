@@ -8,6 +8,7 @@ import { BLOCK_SECTIONS } from "../core/block-cores";
 import Container from 'react-bootstrap/Container';
 import { useFetch } from "../hooks/useFetch";
 import { BLOCK_IMAGES } from "../core/block-cores";
+import { BLOCK_CONTENTS } from "../core/block-cores";
 
 const IconButtonWrapper = (props) => {
     const { children, clickAction } = props;
@@ -37,7 +38,7 @@ export const BlockSection = (props) => {
 
 export const Block = (props) => {
     const [show, setShow] = useState(false);
-    const blockDATA = useFetch("block-data");
+    //const blockDATA = useFetch("blockData");
     const { blockId, blockWidth, blockHeight } = props;
     const handleInfoClick = () => {
         setShow(true);
@@ -51,17 +52,17 @@ export const Block = (props) => {
             </div>
             <div style={{display: 'flex', flex: '1', justifyContent: 'space-between'}} className="pb-1 px-2">
                 <div>
-                    {blockDATA?.[blockId]?.name}
+                    {BLOCK_CONTENTS?.[0]?.name}
                 </div>
                 <div>
                     <IconButtonWrapper clickAction={handleInfoClick}>
                         <RemoveRedEyeOutlinedIcon fontSize="small"/>
                     </IconButtonWrapper>
                     {<InfoModal show={show} setShow={setShow}>
-                        <ModalContent modalBodyContent={blockDATA?.[blockId]?.description} modalTitle={blockDATA?.[blockId]?.name}/>
+                        <ModalContent modalBodyContent={BLOCK_CONTENTS?.[0]?.description} modalTitle={BLOCK_CONTENTS?.[0]?.name}/>
                      </InfoModal>
                     }
-                    <a href={('https://www.'+ blockDATA?.[blockId]?.link) || null} target="_blank" rel="noreferrer">
+                    <a href={('https://www.'+ BLOCK_CONTENTS?.[0]?.link) || null} target="_blank" rel="noreferrer">
                         <IconButtonWrapper>
                         
                             <LaunchIcon fontSize="small"/>                     

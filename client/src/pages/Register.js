@@ -6,6 +6,7 @@ import { Button } from 'react-bootstrap';
 import { Link, Navigate } from 'react-router-dom';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
 
 export const Register = () => {
     const [userEmail, setUserEmail] = useState('');
@@ -38,17 +39,21 @@ export const Register = () => {
               },
               body: JSON.stringify({ firstName: firstName, email: userEmail, password: passwd }),
             });
-      
+            const res = await response.json()
+
             if (response.ok) {
                 setSuccess(true);
             } else {
-                setErrMsg("User already exists");
-                console.error('Failed to add user');
+                setErrMsg(res?.message);
             }
           } catch (error) {
             console.error('Error:', error);
         }
     };
+
+    useEffect(() => {
+        setValidEmail(EMAIL_REGEX.test(userEmail))
+    }, [userEmail])
 
     useEffect(() => {
         setValidFirstName(firstName.length >= 3);
@@ -61,20 +66,22 @@ export const Register = () => {
 
     useEffect(() => {
         setErrMsg('');
-    }, [firstName, passwd, confirmPwd])
+    }, [userEmail, firstName, passwd, confirmPwd])
 
     return(
         <div style={{display: "grid", placeItems: 'center', height: '100vh'}}>
         {success ? (
             <Navigate to={'/'}/>
         ) : (
-        <div style={{width: '30vw', display: 'grid', placeItems: 'center', borderRadius: '20px', paddingTop: '20px', 
-        paddingBottom: '30px', backgroundColor: '#eeeeee'}}>
+        <div style={{display: 'grid', placeItems: 'center', borderRadius: '10px', paddingTop: '20px', 
+        paddingBottom: '30px', backgroundColor: '#eeeeee', paddingLeft: '45px', paddingRight: '45px'}} >
             {errMsg && <p aria-live='assertive'>{errMsg}</p>}
             <h4 className='mb-3'>Register</h4>
             <form onSubmit={handleSubmit}>
                 <label htmlFor='email' className='mb-1'>
                     Email: 
+                    {validEmail && <span><CheckIcon fontSize='sm' style={{ color: 'green' }}/></span>}
+                    {(!validEmail && userEmail) && <span><CloseIcon fontSize='sm' style={{ color: 'red' }}/></span>}
                 </label><br/>
                 <input type='email' id='email' onChange={(e)=>{setUserEmail(e.target.value)}} required aria-invalid={validEmail ? "false" : "true"} 
                 onFocus={() => {setUserEmailFocus(true)}} onBlur={() => setUserEmailFocus(false)} className='mb-3' style={{width: '250px'}} value={userEmail}/><br/>
@@ -109,8 +116,8 @@ export const Register = () => {
 
                 <label htmlFor='confirm-pwd' className='mb-1'>
                     Confirm Password: 
-                    {(validConfirmPwd && confirmPwd) && <span><CheckIcon fontSize='sm' style={{ color: 'green' }}/></span>}
-                    {(confirmPwd && !validConfirmPwd) && <span><CloseIcon fontSize='sm' style={{ color: 'red' }}/></span>}  
+                    {(validPasswd && validConfirmPwd && confirmPwd) && <span><CheckIcon fontSize='sm' style={{ color: 'green' }}/></span>}
+                    {(validPasswd && confirmPwd && !validConfirmPwd) && <span><CloseIcon fontSize='sm' style={{ color: 'red' }}/></span>}  
                 </label><br/>
                 <input type='password' id='confirm-pwd' 
                 onChange={(e) => {setConfirmPwd(e.target.value)}} required aria-invalid={validConfirmPwd ? "false" : "true"} 
@@ -118,11 +125,13 @@ export const Register = () => {
                 {(confirmPwdFocus && !validConfirmPwd) && <p id='confirmPnote' style={{maxWidth: '250px', maxHeight: '150px', backgroundColor: 'black', color: 'white'}}
                 className='p-2 rounded-3'>
                     <InfoIcon/>{" "}
-                    Must match the initial password<br/>
+                    {validPasswd ? (<>Must match the initial password<br/></>) : 
+                        (<>Initial password doesn't meet requirements<br/></>)
+                    }
                 </p>}<br/>
 
                 
-                <Button disabled={!firstName || !validConfirmPwd || !validPasswd} variant='secondary' size='md' type='submit'>
+                <Button disabled={!validEmail || !firstName || !validConfirmPwd || !validPasswd || errMsg} variant='secondary' size='md' type='submit'>
                     Sign Up
                 </Button><br/><br/>
 
