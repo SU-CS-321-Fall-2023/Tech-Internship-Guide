@@ -76,7 +76,7 @@ export const Block = (props) => {
                      </InfoModal>
                     }
                     <IconButtonWrapper clickAction={toggleFavorite}>
-                        <FavoriteIcon style={{ color: isFavorited ? 'red' : 'white' }} />
+                        <FavoriteIcon style={{ color: isFavorited ? 'red' : 'white' }} fontSize="small" />
                     </IconButtonWrapper>
                     <a href={('https://www.' + BLOCK_CONTENTS?.[0]?.link) || null} target="_blank" rel="noreferrer">
                         <IconButtonWrapper>
