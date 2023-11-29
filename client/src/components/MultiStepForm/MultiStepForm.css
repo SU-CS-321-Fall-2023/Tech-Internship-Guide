@@ -1,0 +1,24 @@
+
+.step-progress {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.step {
+  width: 20px;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+  background-color: #007bff;
+  margin-right: 5px;
+}
+
+.completed {
+  background-color: #28a745;
+}
