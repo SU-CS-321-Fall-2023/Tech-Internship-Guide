@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const axios = require("axios");
 
 const emailSchema = require("../models/EmailVerification");
 
@@ -42,7 +41,7 @@ router.get("/blockData", async (req, res) => {
 router.get("/check-link", async (req, res) => {
   const { url } = req.query;
   try {
-    const response = await axios.head(url);
+    const response = await fetch(url, { method: 'HEAD' });
     const lastModifiedHeader = response.headers.get("last-modified");
     if (!lastModifiedHeader) {
       res

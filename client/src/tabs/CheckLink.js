@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 export const CheckLink = () => {
   const [link, setLink] = useState("");
@@ -8,7 +7,7 @@ export const CheckLink = () => {
 
   const checkLink = async (url) => {
     try {
-      const response = await axios.get("http://localhost:4000/check-link", {
+      const response = await fetch("http://localhost:4000/check-link", {
         params: {
           url,
         },

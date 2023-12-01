@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
-import { FaCheck } from "react-icons/fa";
+import CheckIcon from "@mui/icons-material/Check";
 import "./MultiStepForm.css";
 
 export const MultiStepForm = ({
@@ -25,7 +25,7 @@ export const MultiStepForm = ({
           <div key={index} className="d-flex flex-column align-items-center">
             <p>{step.title}</p>
             <div className={`step ${step.completed ? "completed" : ""}`}>
-              {step.completed ? <FaCheck /> : null}
+              {step.completed ? <CheckIcon /> : null}
             </div>
           </div>
         ))}

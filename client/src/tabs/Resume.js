@@ -4,7 +4,6 @@ import { ResumeStep2 } from "../components/ResumeStep2";
 import { ResumeStep3 } from "../components/ResumeStep3";
 import { MultiStepForm } from "../components/MultiStepForm/MultiStepForm";
 import { downloadFile } from "../utils";
-import axios from "axios";
 
 export const Resume = () => {
   const stepRefs = [useRef(), useRef(), useRef()];
@@ -12,14 +11,19 @@ export const Resume = () => {
   let data = {};
   const downloadResume = async (data) => {
     try {
-      const response = await axios.post("http://localhost:4000/resume", data, {
-        responseType: "blob",
+      const response = await fetch("http://localhost:4000/resume", {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
-      // Convert the response to a blob
-      const resumeBlob = new Blob([response.data], {
-        type: "application/octet-stream",
-      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const resumeBlob = await response.blob();
       downloadFile(resumeBlob, "resume.docx");
     } catch (error) {
       console.error("Error:", error);
