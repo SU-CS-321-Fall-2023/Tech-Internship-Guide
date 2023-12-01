@@ -6,8 +6,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const router = require("./routes/router");
 const mongoose = require("mongoose");
+const { testPasswordHelper } = require("./password-helper");
 
-const port = process.env.PORT;
+const port = process.env.PORT || 4000;
 const uri = process.env.DB_CONNECTION_STRING;
 
 const app = express();
@@ -54,6 +55,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use("/", router);
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server started on port ${port}`);
+  await testPasswordHelper();
 });

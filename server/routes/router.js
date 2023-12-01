@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
 
 const emailSchema = require("../models/EmailVerification");
 
 const userModel = require("../models/User");
 const blockModel = require("../models/BlockData");
 const faqModel = require("../models/FreqAQ");
+const { encryptPassword, comparePassword } = require("../password-helper");
 const storyModel = require("../models/Stories");
 const ResumeBuilder = require("../resume-builder/resume-builder");
 
@@ -37,6 +39,23 @@ router.get("/blockData", async (req, res) => {
     .catch((err) => res.json(err));
 });
 
+router.get("/check-link", async (req, res) => {
+  const { url } = req.query;
+  try {
+    const response = await axios.head(url);
+    const lastModifiedHeader = response.headers.get("last-modified");
+    if (!lastModifiedHeader) {
+      res
+        .status(501)
+        .send("last-modified header not present, might be older than 365 days");
+      return;
+    }
+    res.json({ lastModified: lastModifiedHeader });
+  } catch (error) {
+    res.status(error.statusCode).send(error.message);
+  }
+});
+
 router.get("/faqs", async (req, res) => {
   await faqModel
     .find()
@@ -62,11 +81,11 @@ router.post("/users", async (req, res) => {
     return res.status(409).json({ message: "User already exists" });
   }
 
-  //TODO: @Tella encrypt password before saving to database
+  const encryptedPassword = await encryptPassword(req.body.password);
   const user = new userModel({
     email: req?.body?.email,
     firstName: req?.body?.firstName,
-    password: req?.body?.password,
+    password: encryptedPassword,
   });
 
   try {
@@ -83,8 +102,7 @@ router.post("/signin", async (req, res) => {
     if (!user) {
       return res.json({ error: `User doesn't exist` });
     }
-    const validate = user?.password === req.body.password;
-
+    const validate = await comparePassword(user.password, req.body.password);
     if (validate) {
       req.session.isAuth = true;
       req.session.userEmail = req?.body?.email;
