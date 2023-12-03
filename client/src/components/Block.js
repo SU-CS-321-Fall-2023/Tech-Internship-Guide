@@ -10,8 +10,6 @@ import { BLOCK_IMAGES } from "../core/block-cores";
 import { BLOCK_CONTENTS } from "../core/block-cores";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-console.log(BLOCK_CONTENTS)
-
 const IconButtonWrapper = (props) => {
     const { children, clickAction } = props;
     return (

@@ -6,12 +6,12 @@ const emailSchema = require("../models/EmailVerification");
 const userModel = require("../models/User");
 const blockModel = require("../models/BlockData");
 const faqModel = require("../models/FreqAQ");
-const { encryptPassword, comparePassword } = require("../password-helper");
+const { encryptPassword, comparePassword } = require("../configs/password-helper");
 const storyModel = require("../models/Stories");
 const ResumeBuilder = require("../resume-builder/resume-builder");
 
 const isAuth = (req, res, next) => {
-  if (req?.session?.isAuth) {
+  if (req?.session?.userEmail) {
     next();
   } else {
     res.json("User not authenticated!");
@@ -55,6 +55,21 @@ router.get("/check-link", async (req, res) => {
   }
 });
 
+router.post('/validate-link', async(req, res) => {
+    try{
+        const response = await fetch(req?.body?.url, {
+            method: 'HEAD'
+        })
+        if (response?.status >= 200 && response?.status < 300){
+          return res.status(200).json(true)
+        }
+        res.status(404).json(false)
+    }
+    catch(err){
+        res.status(400).json({error: err})
+    }
+})
+
 router.get("/faqs", async (req, res) => {
   await faqModel
     .find()
@@ -80,7 +95,7 @@ router.post("/users", async (req, res) => {
     return res.status(409).json({ message: "User already exists" });
   }
 
-  const encryptedPassword = await encryptPassword(req.body.password);
+  const encryptedPassword = await encryptPassword(req?.body?.password);
   const user = new userModel({
     email: req?.body?.email,
     firstName: req?.body?.firstName,
@@ -101,11 +116,11 @@ router.post("/signin", async (req, res) => {
     if (!user) {
       return res.json({ error: `User doesn't exist` });
     }
-    const validate = await comparePassword(user.password, req.body.password);
+    const validate = await comparePassword(user?.password, req.body?.password);
     if (validate) {
       req.session.isAuth = true;
       req.session.userEmail = req?.body?.email;
-      return res.status(200).json({ message: "Valid user", access: true });
+      return res.status(200).json({ message: "Valid user", access: true});
     }
     res.json({ message: "Invalid Password", access: false });
   } catch (err) {
@@ -158,12 +173,28 @@ router.post("/blockData", async (req, res) => {
   }
 });
 
-router.patch("/favorite/:email", async (req, res) => {
-  try {
-  } catch (err) {
-    res.json(err);
-  }
+router.patch("/favorites", async (req, res) => {
+  //get the user from db
+  //query the user's current favs
+  //add new fav block to the list
 });
+
+router.delete("/favorites", async(req, res) => {
+  //get the user from db
+  //query the user's current favs
+  //remove the unfavorited block
+})
+
+router.get("/favorites", async(req, res) => {
+  try{
+    const userEmail = req?.session?.userEmail
+    const user = userModel.findOne({email: userEmail})
+    res.status(200).json(user?.favorites)
+  }
+  catch(err){
+    res.json(err)
+  }
+})
 
 router.get("/api", (req, res) => {
   res.json({
@@ -204,5 +235,9 @@ router.get("/test", async (req, res) => {
   req.session.isAuth = true;
   res.json(req.session);
 });
+
+router.get("/", (req, res) => {
+  res.send("Hello")
+})
 
 module.exports = router;

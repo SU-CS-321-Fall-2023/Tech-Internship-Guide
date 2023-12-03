@@ -13,20 +13,8 @@ const comparePassword = async (encryptedPassword, plainPassword) => {
   return isMatched;
 };
 
-const testPasswordHelper = async () => {
-  const plainPassword = "passw0rd";
-  const encryptedPassword = await encryptPassword(plainPassword);
-  if (plainPassword !== encryptedPassword) {
-    console.log("Encrypted password => ", encryptedPassword);
-  }
-
-  if (await comparePassword(encryptedPassword, plainPassword)) {
-    console.log("Its working");
-  }
-};
 
 module.exports = {
   encryptPassword,
-  comparePassword,
-  testPasswordHelper,
+  comparePassword
 };
