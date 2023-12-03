@@ -7,7 +7,6 @@ import { Note } from "../tabs/Note";
 import { Networking } from "../tabs/Networking";
 import { Story } from "../tabs/Story";
 import { Faq } from "../tabs/Faq";
-import { CheckLink } from "../tabs/CheckLink";
 
 export const TAB_NAMES = [
   { tabName: "Classes", eventKey: "classes", comp: <Class /> },
@@ -19,5 +18,4 @@ export const TAB_NAMES = [
   { tabName: "Networking", eventKey: "networking", comp: <Networking /> },
   { tabName: "Stories", eventKey: "stories", comp: <Story /> },
   { tabName: "FAQs", eventKey: "faqs", comp: <Faq /> },
-  { tabName: "Check link", eventKey: "link", comp: <CheckLink /> },
 ];

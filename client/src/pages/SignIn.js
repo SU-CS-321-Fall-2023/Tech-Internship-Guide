@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { Button } from 'react-bootstrap';
 import { Navigate } from "react-router";
+import { useSignIn } from "../hooks/useSignIn";
 
 const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 export const SignIn = () => {
+    const loginStatus = useSignIn()
+
     const [userEmail, setUserEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
 
@@ -52,14 +55,7 @@ export const SignIn = () => {
     }, [validEmail, validPasswd, userEmail, passwd])
 
     useEffect(() => {
-        const checkLoginStatus = async() => {
-            const response = await fetch('http://localhost:4000/signin', {
-                credentials: 'include',
-                })
-            const res = await response.json()
-            setSuccess(res?.loggedIn)
-        }
-        checkLoginStatus()
+        setSuccess(loginStatus)
     }, [])
 
     return (

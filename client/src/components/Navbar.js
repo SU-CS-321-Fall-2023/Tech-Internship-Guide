@@ -1,8 +1,11 @@
 import React from "react";
 import { Navbar as NavbarBoot } from "react-bootstrap";
 import { Button } from "react-bootstrap";
+import { useSignIn } from "../hooks/useSignIn";
 
 export const Navbar = () => {
+  const loginStatus = useSignIn()
+
   return (
     <div className="px-3 fw-bolder">
       <NavbarBoot data-bs-theme="dark">
@@ -38,9 +41,28 @@ export const Navbar = () => {
                 <b>Add a Site</b>
               </Button>
             </a>
-            <div className="bg-primary p-1 px-2 rounded-pill text-center">
-              This site updates every 30th
-            </div>
+            {
+              loginStatus ? (
+                <a href="/signout">
+                  <Button className="bg-primary p-1 px-2 rounded-pill text-center me-3 text-white">
+                    Log Out
+                  </Button>
+                </a>
+              ) : (
+                <>
+                  <a href="/signin">
+                    <Button className="bg-primary p-1 px-2 rounded-pill text-center me-3 text-white">
+                      Log In
+                    </Button>
+                  </a>
+                  <a href="/signup">
+                    <Button className="bg-primary p-1 px-2 rounded-pill text-center text-white">
+                      Sign Up
+                    </Button>
+                  </a>
+                </>
+              )
+            }
           </NavbarBoot.Collapse>
         </div>
       </NavbarBoot>

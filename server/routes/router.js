@@ -132,7 +132,7 @@ router.get("/signin", async (req, res) => {
   if (req?.session?.userEmail) {
     return res.status(200).json({ loggedIn: true });
   }
-  res.status(404).json({ loggedIn: false });
+  res.status(404).json({ loggedIn: true });
 });
 
 router.get("/signout", (req, res) => {
