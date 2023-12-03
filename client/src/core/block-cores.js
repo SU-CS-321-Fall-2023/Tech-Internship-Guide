@@ -26,4 +26,8 @@ export const BLOCK_IMAGES = new Set([
     'udacity','udemy','unityLearn','unrealEngine','w3schools','webDevByGoogle','webSummit','wix','zety','zipRecruiter',
 ]);
 
-export const BLOCK_CONTENTS = await fetch('http://localhost:4000/blockData').then(res => res.json()).catch(err => console.error(err))
+const BLOCK_CONTENTS_DB = await fetch('http://localhost:4000/blockData').then(res => res.json()).catch(err => console.error(err))
+export const BLOCK_CONTENTS = {}
+BLOCK_CONTENTS_DB.map((item, index) => {
+    BLOCK_CONTENTS[item?.id] = item
+})

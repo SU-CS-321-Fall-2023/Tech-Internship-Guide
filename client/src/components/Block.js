@@ -6,10 +6,11 @@ import { Button } from "react-bootstrap";
 import { InfoModal, ModalContent } from "./InfoModal";
 import { BLOCK_SECTIONS } from "../core/block-cores";
 import Container from 'react-bootstrap/Container';
-import { useFetch } from "../hooks/useFetch";
 import { BLOCK_IMAGES } from "../core/block-cores";
 import { BLOCK_CONTENTS } from "../core/block-cores";
 import FavoriteIcon from '@mui/icons-material/Favorite';
+
+console.log(BLOCK_CONTENTS)
 
 const IconButtonWrapper = (props) => {
     const { children, clickAction } = props;
@@ -65,20 +66,20 @@ export const Block = (props) => {
             </div>
             <div style={{ display: 'flex', flex: '1', justifyContent: 'space-between' }} className="pb-1 px-2">
                 <div>
-                    {BLOCK_CONTENTS?.[0]?.name}
+                    {BLOCK_CONTENTS?.[blockId]?.name}
                 </div>
                 <div>
                     <IconButtonWrapper clickAction={handleInfoClick}>
                         <RemoveRedEyeOutlinedIcon fontSize="small" />
                     </IconButtonWrapper>
                     {<InfoModal show={show} setShow={setShow}>
-                        <ModalContent modalBodyContent={BLOCK_CONTENTS?.[0]?.description} modalTitle={BLOCK_CONTENTS?.[0]?.name}/>
+                        <ModalContent modalBodyContent={BLOCK_CONTENTS?.[blockId]?.description} modalTitle={BLOCK_CONTENTS?.[blockId]?.name}/>
                      </InfoModal>
                     }
                     <IconButtonWrapper clickAction={toggleFavorite}>
                         <FavoriteIcon style={{ color: isFavorited ? 'red' : 'white' }} fontSize="small" />
                     </IconButtonWrapper>
-                    <a href={('https://www.' + BLOCK_CONTENTS?.[0]?.link) || null} target="_blank" rel="noreferrer">
+                    <a href={('https://www.' + BLOCK_CONTENTS?.[blockId]?.link) || null} target="_blank" rel="noreferrer">
                         <IconButtonWrapper>
                             <LaunchIcon fontSize="small" />
                         </IconButtonWrapper>

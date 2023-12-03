@@ -54,11 +54,7 @@ export const SignIn = () => {
     useEffect(() => {
         const checkLoginStatus = async() => {
             const response = await fetch('http://localhost:4000/signin', {
-                method: 'GET',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
                 })
             const res = await response.json()
             setSuccess(res?.loggedIn)

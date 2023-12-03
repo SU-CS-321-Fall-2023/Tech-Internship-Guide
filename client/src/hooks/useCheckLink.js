@@ -8,8 +8,14 @@ export const useCheckLink = (url) => {
     useEffect(() => {
         const checkLink = async() => {
             try{
-                const response = await fetch(url, {method: "HEAD"})
-                response?.status >= 200 && response?.status < 300 ? setValid(true) : setValid(false)
+                const response = await fetch('http://localhost:4000/validate-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({url: url})
+                })
+                response.status === 200 ? setValid(true) : setValid(false)
                 setLoading(false);
                 return
             }
