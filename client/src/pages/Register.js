@@ -4,11 +4,14 @@ import InfoIcon from '@mui/icons-material/Info';
 import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link, Navigate } from 'react-router-dom';
+import { useSignIn } from '../hooks/useSignIn';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
 
 export const Register = () => {
+    const loginStatus = useSignIn()
+    
     const [userEmail, setUserEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
     const [userEmailFocus, setUserEmailFocus] = useState(false);
@@ -67,6 +70,10 @@ export const Register = () => {
     useEffect(() => {
         setErrMsg('');
     }, [userEmail, firstName, passwd, confirmPwd])
+
+    useEffect(() => {
+        setSuccess(loginStatus)
+    }, [loginStatus])
 
     return(
         <div style={{display: "grid", placeItems: 'center', height: '100vh'}}>

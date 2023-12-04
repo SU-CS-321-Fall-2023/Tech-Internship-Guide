@@ -56,7 +56,7 @@ export const SignIn = () => {
 
     useEffect(() => {
         setSuccess(loginStatus)
-    }, [])
+    }, [loginStatus])
 
     return (
         <div style={{display: "grid", placeItems: 'center', height: '100vh'}}>
