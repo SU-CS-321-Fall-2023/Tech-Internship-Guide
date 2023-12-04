@@ -13,11 +13,11 @@ const AccordionItem = (props) => {
 };
 
 export const Accordion = () => {
-    const faqDATA = useFetch("faqs");
+    const {data} = useFetch("faqs");
     
     return(
         <Accord className="mb-3" style={{width: '70vw'}}>
-            {faqDATA.map((item, index) => (
+            {data.map((item, index) => (
                 <AccordionItem eventKey={index} key={index} question={item?.question} answer={item?.answer}/>
             ))}
         </Accord>

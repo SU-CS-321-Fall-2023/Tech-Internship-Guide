@@ -6,6 +6,7 @@ const emailSchema = require("../models/EmailVerification");
 const userModel = require("../models/User");
 const blockModel = require("../models/BlockData");
 const faqModel = require("../models/FreqAQ");
+const Post = require("../models/Forum");
 const { encryptPassword, comparePassword } = require("../configs/password-helper");
 const storyModel = require("../models/Stories");
 const ResumeBuilder = require("../resume-builder/resume-builder");
@@ -104,6 +105,7 @@ router.post("/users", async (req, res) => {
 
   try {
     const newUser = await user.save();
+    req.session.userId = newUser?._id;
     res.status(201).json(newUser);
   } catch (err) {
     res.status(400).json(err);
@@ -120,6 +122,7 @@ router.post("/signin", async (req, res) => {
     if (validate) {
       req.session.isAuth = true;
       req.session.userEmail = req?.body?.email;
+      req.session.user= user;
       return res.status(200).json({ message: "Valid user", access: true});
     }
     res.json({ message: "Invalid Password", access: false });
@@ -231,13 +234,150 @@ router.post("/resume", (req, res) => {
   }
 });
 
+router.get('/posts', async (req, res) => {
+    try {
+      const posts = await Post.find()
+        .sort({ createdAt: -1 })
+        .populate({
+          path: 'user',
+          model: 'users',
+          select: 'firstName email',
+        })
+        .populate({
+          path: 'replies.userId',
+          model: 'users',
+          select: 'firstName email', // Add any other fields you want to select
+        });
+  
+      res.json(posts);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+  
+
+router.post('/post', isAuth, async (req, res) => {
+    try {  
+      const { content } = req.body;
+      console.log(content, 'content');
+      const userId = req.session.user._id;
+      console.log(userId, 'userId');
+      const newPost = new Post({
+        content,
+        user: userId,
+      });
+      const savedPost = await newPost.save();
+      res.json(savedPost);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  router.post('/post/:postId/replies',isAuth,  async (req, res) => {
+    try {
+      const { content} = req.body;
+      const postId = req.params.postId;
+      const userId = req.session.user._id;
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+      }
+      post.replies.push({
+        content,
+        userId,
+      });
+      const updatedPost = await post.save();
+      res.json(updatedPost);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  router.patch('/post/:postId/likes', async (req, res) => {
+    try {
+      const postId = req.params.postId;
+      const userId = req.session.user._id;
+      console.log(userId, 'userId');
+      const post = await Post.findById(postId);
+  
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+      }
+  
+      const stringifiedUserIds = post.likes.map(id => id.toString());
+      const hasLiked = stringifiedUserIds.includes(userId.toString());
+      if (hasLiked) {
+        post.likes = post.likes.filter(id => id.toString() !== userId.toString());
+      } else {
+        post.likes.push(userId);
+      }
+  
+      const updatedPost = await post.save();
+      res.json(updatedPost);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+
+    router.patch('/post/:postId/replies/:replyId/likes', async (req, res) => {
+        try {
+        const { postId, replyId } = req.params;
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        const reply = post.replies.id(replyId);
+        if (!reply) {
+            return res.status(404).json({ message: 'Reply not found' });
+        }
+        reply.likes++;
+        const updatedPost = await post.save();
+        res.json(updatedPost);
+        } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+        }
+    });
+
+    router.delete('/posts/:postId', async (req, res) => {
+        try {
+        const postId = req.params.postId;
+        const deletedPost = await Post.findByIdAndDelete(postId);
+        res.json(deletedPost);
+        } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+        }
+    });
+
+    router.delete('/posts/:postId/replies/:replyId', async (req, res) => {
+        try {
+        const { postId, replyId } = req.params;
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        const reply = post.replies.id(replyId);
+        if (!reply) {
+            return res.status(404).json({ message: 'Reply not found' });
+        }
+        reply.remove();
+        const updatedPost = await post.save();
+        res.json(updatedPost);
+        } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+        }
+    });
+
+
 router.get("/test", async (req, res) => {
   req.session.isAuth = true;
   res.json(req.session);
 });
-
-router.get("/", (req, res) => {
-  res.send("Hello")
-})
 
 module.exports = router;

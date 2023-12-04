@@ -6,6 +6,7 @@ import {Route, Routes} from 'react-router-dom';
 import { SignOut } from './pages/SignOut';
 import { useSignIn } from './hooks/useSignIn';
 import { NotFound } from './components/Notfound';
+import { NotAuthorized } from './components/NotAuthorized';
 
 function App() {
   const loggedIn = useSignIn()
@@ -14,7 +15,8 @@ function App() {
     <div className="container-fluid min-vh-100 bg-secondary">
       <Routes>
         <Route exact path='/' element={<Home />}/>
-        {loggedIn && <Route exact path='/resources' element={<Resources/>}/>}
+        {loggedIn ? <Route exact path='/resources' element={<Resources/>}/> : 
+        <Route exact path='/resources' element={<NotAuthorized/>}/>}
         <Route exact path='/signup' element={<Register/>}/>
         <Route exact path='/signin' element={<SignIn/>}/>
         <Route exact path='/m/signout' element={<SignOut/>}/>

@@ -2,7 +2,7 @@ export const BLOCK_SECTIONS = {
     pFundamentals: ['w3schools', 'freeCodeCamp', 'codeacademy', 'neetCode', 'coursera', 'geeksforgeeks', "harvardCS50"],
     dSA: ['neetCode', 'coursera', 'geeksforgeeks'],
     practiceMasSec: ['leetcode','hackerRank','codeSignal','algoExpert','interviewio'],
-    note: ['personalNote', 'onlineNotes'],
+    note: [],
     webDev: ['webDevByGoogle','githubAWDRepo', 'frontEndMasters','mdn','w3schools',],
     gameDev: ['gameDevNet','unrealEngine','unityLearn','coursera'],
     resBuild: ['resumeCom','resumeGen','balanceCareers','zety','monsterResume'],
