@@ -1,6 +1,6 @@
 import React from "react";
 import { FeaturedStory } from "../components/FeaturedStory";
-import { useFetch } from "../hooks/useFetch";
+import { useFetch } from '../hooks/useFetch';
 
 export const Story = () => {
     const {data} = useFetch("stories");

@@ -2,7 +2,7 @@ import { Class } from "../tabs/Class";
 import { Project } from "../tabs/Project";
 import { Resume } from "../tabs/Resume";
 import { Internship } from "../tabs/Internship";
-import { Interview } from '../tabs/Interview';
+import { Interview } from "../tabs/Interview";
 import { Note } from "../tabs/Note";
 import { Networking } from "../tabs/Networking";
 import { Story } from "../tabs/Story";
@@ -16,6 +16,6 @@ export const TAB_NAMES = [
     {tabName: 'Internships', eventKey: 'internships', comp: <Internship/>},
     {tabName: 'Forum', eventKey: 'forum', comp: <Note/>}, 
     {tabName: 'Networking', eventKey: 'networking', comp: <Networking/>},
-    {tabName: 'Team', eventKey: 'team', comp: <Story/>},
+    {tabName: 'Stories', eventKey: 'stories', comp: <Story/>},
     {tabName: 'FAQs', eventKey: 'faqs', comp: <Faq/>}
 ];

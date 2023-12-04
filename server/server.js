@@ -6,10 +6,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const router = require("./routes/router");
 const mongoose = require("mongoose");
-const { testPasswordHelper } = require("./password-helper");
 
 const port = process.env.PORT || 4000;
-const uri = process.env.DB_CONNECTION_STRING
+const uri = process.env.DB_CONNECTION_STRING;
 
 const app = express();
 
@@ -23,6 +22,14 @@ const ConnectMongoDB = async () => {
 };
 
 ConnectMongoDB();
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 const store = new mongoSession({
   uri,
@@ -38,6 +45,7 @@ app.use(
     cookie: {
       secure: false,
       httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24
     },
     store: store,
   })
@@ -46,16 +54,8 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const corsOptions = {
-  origin: ["*", "http://127.0.0.1:54579", "http://localhost:3000"],
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
 app.use("/", router);
 
 app.listen(port, async () => {
   console.log(`Server started on port ${port}`);
-  await testPasswordHelper();
 });

@@ -25,3 +25,12 @@ export const BLOCK_IMAGES = new Set([
     'resumeGen','resumeCom','reu','rewritingTheCode','rsa','simplyHired','simplify','techCrunch','template','balanceCareers','theMuse',
     'udacity','udemy','unityLearn','unrealEngine','w3schools','webDevByGoogle','webSummit','wix','zety','zipRecruiter',
 ]);
+
+export const BLOCK_CONTENTS = {}
+await fetch('http://localhost:4000/blockData')
+            .then(res => res.json())
+            .then(res =>
+                    res.map((item, index) => {
+                        BLOCK_CONTENTS[item?.id] = item
+                    }))
+            .catch(err => console.error(err))

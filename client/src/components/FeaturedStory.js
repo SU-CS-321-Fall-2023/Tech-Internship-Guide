@@ -13,7 +13,7 @@ export const FeaturedStory = (props) => {
                 <div className="col-md-9 rounded">
                     <i>
                         <h5>
-                            {personName}, {featuredItem?.company}
+                            Software Engineering Intern, {featuredItem?.company}
                         </h5>
                         <div>
                             {featuredItem?.story}
