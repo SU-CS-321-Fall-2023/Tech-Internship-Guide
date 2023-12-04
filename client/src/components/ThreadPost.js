@@ -1,8 +1,6 @@
-// ThreadPostWithComments.js
-
 import React, { useState } from "react";
 import { Card, Image, Button } from "react-bootstrap";
-import PostTextBox from "./CommentPostBox";
+import CommentPostBox from "./CommentPostBox";
 
 function CardContent({
   text,
@@ -14,7 +12,8 @@ function CardContent({
   startReply,
   isReply,
   name,
-  image
+  image,
+  postId
 }) {
 
   const cardStyle = isReply ? { marginLeft: "50px" } : {};
@@ -58,10 +57,12 @@ function CardContent({
           </Button>
         </div>
         {startReply && (
-          <PostTextBox
+          <CommentPostBox
             styling="mx-auto mt-3 mb-3"
             placeholder="Reply to this post..."
             title="Reply"
+            postId={postId}
+
           />
         )}
       </Card.Body>
@@ -71,29 +72,9 @@ function CardContent({
 
 function ThreadPost(props) {
     const [showComments, setShowComments] = useState(false);
-    const [likes, setLikes] = useState(0);
     const [showReplies, setShowReplies] = useState(false);
-
-
-
-  const replies = [
-    {
-      text: "Secrecy is so detrimental to the AI field and to the world right now. It fuels misinformation, sends tons of researchers and ressources to the wrong directions and leads to dangerous mistakes like bad regulation because of public opinion fears. I wish leaders of the field would take this issue more seriously and foster more transparency and openness",
-      likes: 0,
-      comments: 0,
-    },
-    {
-      text: "As a community, RTC has always been dedicated to inclusivity and support for all of our members. This year, we took a significant step forward in achieving that goal by launching Tech Natives, our third Affinity Group, to cater to Native ",
-      likes: 0,
-      comments: 0,
-    },
-    {
-      text: "I'm seeing a huge up tick in companies posting recruiting jobs just this week which makes me happy to see! Below are jobs to check out across the US. ",
-      likes: 0,
-      comments: 0,
-    },
-  ];
-  const [startReplies, setStartReplies] = useState(Array(replies.length).fill(false));
+    console.log(props, "ThreadPost props");
+  const [startReplies, setStartReplies] = useState(Array(props.comments?.length).fill(false));
   const handleToggleComments = () => {
     setShowComments(!showComments);
     setShowReplies(!showReplies);
@@ -105,7 +86,7 @@ function ThreadPost(props) {
   };
 
   const handleLike = () => {
-    setLikes(likes + 1);
+    props.onLike(props.postId);
   };
 
   return (
@@ -115,30 +96,34 @@ function ThreadPost(props) {
     >
       <CardContent
         text={props.text}
-        likes={props.likes}
-        comments={props.comments}
+        likes={props.likes?.length}
         onToggleComments={handleToggleComments}
         onLike={handleLike}
         name={props.name}
         image={props.image}
+        postId={props.postId}
+
       />
 
       {showComments && (
         <div>
-          <PostTextBox
+          <CommentPostBox
             styling="mx-auto mt-3 mb-3"
             placeholder="Reply to this post..."
             title="Reply"
+            postId={props.postId}
+            
           />
         </div>
       )}
 
       {showReplies && (
         <div>
-          {replies.map(({ text, likes, comments }, index) => (
+          {props?.comments?.map(({ content, likes, comments, userId }, index) => (
             <CardContent
               key={index}
-              text={text}
+              name= {userId?.firstName || "Unknown User"}
+              text={content}
               likes={likes}
               comments={comments}
               onToggleReplies={() => handleToggleReplies(index)}  // Pass index to handleToggleReplies

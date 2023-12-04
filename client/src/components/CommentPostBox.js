@@ -1,14 +1,49 @@
 import React, { useState } from "react";
 import { Form, Row, Col } from "react-bootstrap";
 
-const PostTextBox = (props) => {
+const CommentPostBox = (props) => {
+  console.log(props, "comment post box props");
   const [isButtonClicked, setButtonClicked] = useState(false);
+  const [postText, setPostText] = useState("");
 
-  const handleButtonClick = () => {
+
+  const handleButtonClick = async (event) => {
+    event.preventDefault();
     setButtonClicked(true);
     setTimeout(() => {
       setButtonClicked(false);
     }, 500);
+
+    try {
+      let url;
+      console.log(props?.title, "props?.title");
+
+      if (props?.title === "Post") {
+        url = 'http://localhost:4000/post';
+      } else if (props?.title === "Reply" && props?.postId) {
+        console.log(props?.postId, "props?.postId", "Reply Hello" );
+        url = `http://localhost:4000/post/${props?.postId}/replies`;
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: postText
+        }),
+      });
+
+      const data = await response.json();
+      if (props?.title === "Post") {
+      props.updatePosts();
+      }
+      setPostText("");
+      console.log(data);
+    } catch (error) {
+      console.error("This is the error");
+      console.error(error);
+    }
   };
 
   return (
@@ -36,6 +71,8 @@ const PostTextBox = (props) => {
                   color: "white",
                   boxShadow: "none",
                 }}
+                onChange={(event) => setPostText(event.target.value)}
+                value={postText}
               />
               <div
                 className="position-absolute d-flex align-items-center justify-content-center"
@@ -65,4 +102,4 @@ const PostTextBox = (props) => {
   );
 };
 
-export default PostTextBox;
+export default CommentPostBox;

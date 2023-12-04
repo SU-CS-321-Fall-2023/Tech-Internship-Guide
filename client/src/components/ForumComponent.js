@@ -1,50 +1,46 @@
-import React from "react";
-import PostTextBox from "./CommentPostBox";
+import React, { useEffect, useState } from "react";
 import ThreadPost from "./ThreadPost";
-
-//This is just a dummy data for the forum
-
-// We will pull the data from the database and display it here
-
-const posts = [
-  {
-    id: 1,
-    text: "This is the first post",
-    likes: 10,
-    comments: 5,
-    image: "https://picsum.photos/200",
-    name: "John Doe",
-  },
-  {
-    id: 2,
-    text: "This is the second post",
-    likes: 20,
-    comments: 10,
-    image: "https://picsum.photos/200",
-    name: "Jane Doe",
-  },
-  {
-    id: 3,
-    text: "This is the third post",
-    likes: 30,
-    comments: 15,
-    image: "https://picsum.photos/200",
-    name: "John Brown",
-  },
-];
+import CommentPostBox from "./CommentPostBox";
+import { useFetch } from "../hooks/useFetch";
 
 const ForumComponent = () => {
+  const [posts, setPosts] = useState([]);
+  const {data, refetch} = useFetch("posts");
+
+  useEffect(() => {
+    setPosts(data);
+    console.log(posts, "posts");
+  }, [data]); 
+
+  const updatePosts = async () => {
+   refetch();
+  };
+
+  const handleLike = async (postId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/post/${postId}/likes`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+      
+        refetch();
+      } else {
+        console.error(`Failed to like post with ID: ${postId}`);
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+
   return (
-    <div >
+    <div>
       <div>
-        <PostTextBox
-          styling="m-3"
-          placeholder="Make a post"
-          title="Post"
-        />
+        <CommentPostBox styling="m-3" placeholder="Make a post" title="Post" updatePosts={updatePosts} />
         <div>
-          {posts.map(({ id, text, likes, comments, name, image}) => (
-            <ThreadPost key={id} text={text} likes={likes} comments={comments} name= {name} image={image}  />
+          {posts?.map(({ _id, content, likes, replies, user, image }) => (
+            <ThreadPost key={_id} postId = {_id} text={content} likes={likes} comments={replies} name={user?.firstName || "Unknown User"} image={image} onLike = {handleLike} />
           ))}
         </div>
       </div>

@@ -2,24 +2,31 @@ import { useState, useEffect } from "react";
 
 export const useFetch = (path) => {
   const [data, setData] = useState([{}]);
-  const fetchPath = "http://localhost:4000/" + path
-  console.log(fetchPath);
+  const fetchPath = "http://localhost:4000/" + path;
 
   useEffect(() => {
-      fetch(fetchPath)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setData(data);
-        })
-        .catch((error) => {
-          console.error("Fetch Error:", error);
-        });
+    const fetchData = async () => {
+      try {
+        const response = await fetch(fetchPath);
+        const data = await response.json();
+        setData(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
   }, [fetchPath]);
 
-  return(data);
+  const refetch = async () => {
+    try {
+      const response = await fetch(fetchPath);
+      const newData = await response.json();
+      setData(newData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return { data, refetch };
 };

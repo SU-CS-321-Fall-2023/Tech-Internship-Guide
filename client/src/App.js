@@ -1,20 +1,18 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Register } from './pages/Register';
+import { SignIn } from './pages/SignIn';
 import { Home } from './pages/Home';
-import { TabGroup } from './components/Tab';
-import { Navbar } from "./components/Navbar";
+import { Resources } from './pages/Resources';
+import {Route, Routes} from 'react-router-dom';
 
 function App() {
   return (
-    <div className="App">
-      <div className="container-fluid min-vh-100 bg-secondary">
-        <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path='/resources' element={<TabGroup />} />
-          </Routes>
-        </Router>
-      </div>
+    <div className="container-fluid min-vh-100 bg-secondary">
+      <Routes>
+        <Route exact path='/' element={<Home />}/>
+        <Route exact path='/resources' element={<Resources/>}/>
+        <Route exact path='/signup' element={<Register/>}/>
+        <Route exact path='/signin' element={<SignIn/>}/>
+      </Routes>
     </div>
   );
 }

@@ -4,15 +4,16 @@ import { Container, Row, Col } from "react-bootstrap";
 import FavoriteComponent from "../components/FavoriteComponent";
 import { SearchBarComponent } from '../components/SearchBarComponent';
 import GetStartedGrid from '../components/GetStartedGrid';
+import { Navbar } from '../components/Navbar';
+
 export const Home = () => {
     return (
         <>
+            <Navbar />
             <Container
                 fluid
-
                 style={{ backgroundColor: "dark", maxWidth: "100%", maxHeight: "100%" }}
             >
-
                 {/* Search Bar */}
                 <Row className="mb-4 justify-content-center">
                     <Col md={6}>
@@ -40,8 +41,6 @@ export const Home = () => {
                     </Col>
                 </Row>
             </Container>
-
-
             <Footer />
         </>
     );
