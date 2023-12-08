@@ -106,6 +106,7 @@ router.post("/users", async (req, res) => {
   try {
     const newUser = await user.save();
     req.session.userId = newUser?._id;
+    req.session.userEmail = req?.body?.email;
     res.status(201).json(newUser);
   } catch (err) {
     res.status(400).json(err);
@@ -120,9 +121,8 @@ router.post("/signin", async (req, res) => {
     }
     const validate = await comparePassword(user?.password, req.body?.password);
     if (validate) {
-      req.session.isAuth = true;
+      req.session.userId = newUser?._id;
       req.session.userEmail = req?.body?.email;
-      req.session.user= user;
       return res.status(200).json({ message: "Valid user", access: true});
     }
     res.json({ message: "Invalid Password", access: false });
