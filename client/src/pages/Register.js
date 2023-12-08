@@ -11,7 +11,7 @@ const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
 
 export const Register = () => {
     const loginStatus = useSignIn()
-    
+
     const [userEmail, setUserEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
     const [userEmailFocus, setUserEmailFocus] = useState(false);
@@ -37,6 +37,7 @@ export const Register = () => {
         try {
             const response = await fetch('http://localhost:4000/users', {
               method: 'POST',
+              credentials: 'include',
               headers: {
                 'Content-Type': 'application/json',
               },
