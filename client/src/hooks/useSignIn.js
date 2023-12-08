@@ -13,7 +13,7 @@ export const useSignIn = () => {
             setStatus(res?.loggedIn)
         }
         check()
-    })
+    }, [])
 
     return status 
 }

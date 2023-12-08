@@ -117,11 +117,11 @@ router.post("/signin", async (req, res) => {
   try {
     const user = await userModel.findOne({ email: req?.body?.email });
     if (!user) {
-      return res.json({ error: `User doesn't exist` });
+      return res.json({ error: `User doesn't exist`, access: false });
     }
     const validate = await comparePassword(user?.password, req.body?.password);
     if (validate) {
-      req.session.userId = newUser?._id;
+      req.session.userId = user?._id;
       req.session.userEmail = req?.body?.email;
       return res.status(200).json({ message: "Valid user", access: true});
     }
