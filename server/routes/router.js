@@ -107,6 +107,7 @@ router.post("/users", async (req, res) => {
     const newUser = await user.save();
     req.session.userId = newUser?._id;
     req.session.userEmail = req?.body?.email;
+    req.session.user = newUser;
     res.status(201).json(newUser);
   } catch (err) {
     res.status(400).json(err);
@@ -123,6 +124,7 @@ router.post("/signin", async (req, res) => {
     if (validate) {
       req.session.userId = user?._id;
       req.session.userEmail = req?.body?.email;
+      req.session.user = user;
       return res.status(200).json({ message: "Valid user", access: true});
     }
     res.json({ message: "Invalid Password", access: false });
@@ -261,7 +263,6 @@ router.get('/posts', async (req, res) => {
 router.post('/post', isAuth, async (req, res) => {
     try {  
       const { content } = req.body;
-      console.log(content, 'content');
       const userId = req.session.user._id;
       console.log(userId, 'userId');
       const newPost = new Post({
@@ -277,7 +278,7 @@ router.post('/post', isAuth, async (req, res) => {
   });
   router.post('/post/:postId/replies',isAuth,  async (req, res) => {
     try {
-      const { content} = req.body;
+      const { content } = req.body;
       const postId = req.params.postId;
       const userId = req.session.user._id;
       const post = await Post.findById(postId);
