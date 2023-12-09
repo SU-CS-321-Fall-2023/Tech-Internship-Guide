@@ -27,12 +27,19 @@ POST   http://localhost:4000/signin
 Content-Type: application/json
 
 {
-    "email": "ade@gmail.com",
+    "email": "a@gmail.com",
     "password": "@Hello08"
 }
 
 ###
 GET http://localhost:4000/signin
+
+
+###
+GET http://localhost:4000/favorites
+
+###
+DELETE  http://localhost:4000/favorites/w3schools
 
 ###
 GET http://localhost:4000/signout

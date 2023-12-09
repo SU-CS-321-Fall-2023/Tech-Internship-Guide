@@ -1,3 +1,4 @@
+/* eslint-disable no-lone-blocks */
 import React, { useState, useEffect } from "react";
 import Card from 'react-bootstrap/Card';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
@@ -9,6 +10,7 @@ import Container from 'react-bootstrap/Container';
 import { BLOCK_IMAGES } from "../core/block-cores";
 import { BLOCK_CONTENTS } from "../core/block-cores";
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { FAV_BLOCKS } from "../core/block-cores";
 
 const IconButtonWrapper = (props) => {
     const { children, clickAction } = props;
@@ -39,17 +41,40 @@ export const BlockSection = (props) => {
 export const Block = (props) => {
     const [isFavorited, setIsFavorited] = useState(false);
     const [show, setShow] = useState(false);
-    //const blockDATA = useFetch("blockData");
     const { blockId, blockWidth, blockHeight } = props;
 
     useEffect(() => {
+        FAV_BLOCKS.includes(blockId) && setIsFavorited(true)
+    }, [blockId, isFavorited])
 
-        // Replace this with your actual database update function
-        //updateDatabaseWithFavoriteStatus(blockId, isFavorited);
-    }, [isFavorited]);
+    useEffect(() => {
+        const patchFav = async() => {
+            await fetch("http://localhost:4000/favorites", {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ blockName: blockId }),
+            });            
+        }
+        !(FAV_BLOCKS.includes(blockId)) && isFavorited && patchFav()
+    }, [isFavorited, blockId])
+
+    {/*
+    useEffect(() => {
+        const deleteFav = async() => {
+            await fetch(`http://localhost:4000/favorites/${blockId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            });
+        }
+        FAV_BLOCKS.includes(blockId) && !isFavorited && deleteFav()
+    }, [!isFavorited, blockId])
+    */}
 
     const toggleFavorite = () => {
-        setIsFavorited(!isFavorited);
+        setIsFavorited(!isFavorited)
     };
 
     const handleInfoClick = () => {

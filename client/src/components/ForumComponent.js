@@ -9,7 +9,6 @@ const ForumComponent = () => {
 
   useEffect(() => {
     setPosts(data);
-    console.log(posts, "posts");
   }, [data]); 
 
   const updatePosts = async () => {

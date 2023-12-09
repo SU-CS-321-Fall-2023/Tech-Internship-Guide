@@ -1,9 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, ListGroup, ListGroupItem, Container, Row, Col } from "react-bootstrap";
 import { Block } from "./Block";
 
 const FavoriteComponent = () => {
-  const mockDBFavorites = ["w3schools", "freeCodeCamp","rewritingTheCode","colorstack"];
+  const [favorites, setFavorites] = useState([])
+
+  useEffect(() => {
+    const fetchFav = async() => {
+      const data = await fetch("http://localhost:4000/favorites", {
+        method: 'GET',
+        credentials: 'include'
+      })
+      const res = await data.json()
+      setFavorites(res)
+    }
+    fetchFav()
+  }, [favorites])
+  
   const scrollableListStyles = {
     overflowX: 'auto',
     scrollbarWidth: 'none',
@@ -20,7 +33,7 @@ const FavoriteComponent = () => {
             <Card.Header>Favorites:</Card.Header>
             <div style={scrollableListStyles} >
               <ListGroup variant="flush" className="d-flex flex-row list-group-horizontal">
-                {mockDBFavorites.map((item, index) => (
+                {favorites.map((item, index) => (
                   <ListGroupItem key={index} style={{ backgroundColor: "grey" }}>
                     <Block key={index} blockId ={item}/>
                   </ListGroupItem>

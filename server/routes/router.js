@@ -13,7 +13,7 @@ const ResumeBuilder = require("../resume-builder/resume-builder");
 
 const isAuth = (req, res, next) => {
   if (req?.session?.userEmail) {
-    next();
+    next()
   } else {
     res.json("User not authenticated!");
   }
@@ -178,26 +178,43 @@ router.post("/blockData", async (req, res) => {
   }
 });
 
-router.patch("/favorites", async (req, res) => {
-  //get the user from db
-  //query the user's current favs
-  //add new fav block to the list
-});
-
-router.delete("/favorites", async(req, res) => {
-  //get the user from db
-  //query the user's current favs
-  //remove the unfavorited block
-})
-
-router.get("/favorites", async(req, res) => {
+router.patch("/favorites", isAuth, async (req, res) => {
   try{
-    const userEmail = req?.session?.userEmail
-    const user = userModel.findOne({email: userEmail})
-    res.status(200).json(user?.favorites)
+    const user = await userModel.findOne({email: req?.session?.userEmail})
+    const favBlocks = user.favoriteBlocks
+    if (!favBlocks.includes(req?.body?.blockName)){
+      favBlocks.push(req?.body?.blockName)
+    }
+    await user.updateOne({favoriteBlocks: favBlocks})
+    res.status(200).json('Favorite blocks updated!')
   }
   catch(err){
     res.json(err)
+  }
+});
+
+router.delete("/favorites/:blockName", isAuth ,async(req, res) => {
+  try{
+    const user = await userModel.findOne({email: req?.session?.userEmail})
+    const favBlocks = user.favoriteBlocks
+    if (favBlocks.includes(req?.params?.blockName)){
+      favBlocks.pop(req?.params?.blockName)
+    }
+    await user.updateOne({favoriteBlocks: favBlocks})
+    res.status(200).json('Favorite blocks updated!')
+  }
+  catch(err){
+    res.json(err)
+  }
+})
+
+router.get("/favorites", isAuth ,async(req, res) => {
+  try{
+    const user = await userModel.findOne({email: req?.session?.userEmail})
+    res.status(200).json(user.favoriteBlocks)
+  }
+  catch(err){
+    res.status(400).json(err)
   }
 })
 
@@ -264,7 +281,6 @@ router.post('/post', isAuth, async (req, res) => {
     try {  
       const { content } = req.body;
       const userId = req.session.user._id;
-      console.log(userId, 'userId');
       const newPost = new Post({
         content,
         user: userId,
@@ -300,7 +316,6 @@ router.post('/post', isAuth, async (req, res) => {
     try {
       const postId = req.params.postId;
       const userId = req.session.user._id;
-      console.log(userId, 'userId');
       const post = await Post.findById(postId);
   
       if (!post) {

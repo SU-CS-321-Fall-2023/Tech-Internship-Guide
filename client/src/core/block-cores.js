@@ -30,7 +30,23 @@ export const BLOCK_CONTENTS = {}
 await fetch('http://localhost:4000/blockData')
             .then(res => res.json())
             .then(res =>
-                    res.map((item, index) => {
+                    res?.map((item, index) => {
                         BLOCK_CONTENTS[item?.id] = item
                     }))
             .catch(err => console.error(err))
+
+export const FAV_BLOCKS = []
+await fetch("http://localhost:4000/favorites", {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(
+            res => res.json()
+        )
+        .then(
+            res => 
+            res?.map((item, index) => {
+                FAV_BLOCKS.push(item)
+            })
+        )
+        .catch(err => console.error(err))
