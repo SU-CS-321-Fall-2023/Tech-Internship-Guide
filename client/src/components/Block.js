@@ -43,37 +43,28 @@ export const Block = (props) => {
     const [show, setShow] = useState(false);
     const { blockId, blockWidth, blockHeight } = props;
 
+    const updateFavorites = async () => {
+        try {
+            await fetch("http://localhost:4000/favorites", {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ blockId: blockId, isFavorited: !isFavorited }),
+            });
+        } catch (error) {
+            console.error("Error updating favorites:", error);
+        }
+    };
+
+
     useEffect(() => {
         FAV_BLOCKS.includes(blockId) && setIsFavorited(true)
     }, [blockId, isFavorited])
 
-    useEffect(() => {
-        const patchFav = async() => {
-            await fetch("http://localhost:4000/favorites", {
-            method: 'PATCH',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ blockName: blockId }),
-            });            
-        }
-        !(FAV_BLOCKS.includes(blockId)) && isFavorited && patchFav()
-    }, [isFavorited, blockId])
-
-    {/*
-    useEffect(() => {
-        const deleteFav = async() => {
-            await fetch(`http://localhost:4000/favorites/${blockId}`, {
-            method: 'DELETE',
-            credentials: 'include',
-            });
-        }
-        FAV_BLOCKS.includes(blockId) && !isFavorited && deleteFav()
-    }, [!isFavorited, blockId])
-    */}
-
-    const toggleFavorite = () => {
+    const toggleFavorite = async () => {
+        await updateFavorites();
         setIsFavorited(!isFavorited)
     };
 
@@ -96,8 +87,8 @@ export const Block = (props) => {
                         <RemoveRedEyeOutlinedIcon fontSize="small" />
                     </IconButtonWrapper>
                     {<InfoModal show={show} setShow={setShow}>
-                        <ModalContent modalBodyContent={BLOCK_CONTENTS?.[blockId]?.description} modalTitle={BLOCK_CONTENTS?.[blockId]?.name}/>
-                     </InfoModal>
+                        <ModalContent modalBodyContent={BLOCK_CONTENTS?.[blockId]?.description} modalTitle={BLOCK_CONTENTS?.[blockId]?.name} />
+                    </InfoModal>
                     }
                     <IconButtonWrapper clickAction={toggleFavorite}>
                         <FavoriteIcon style={{ color: isFavorited ? 'red' : 'white' }} fontSize="small" />
