@@ -186,10 +186,8 @@ router.patch("/favorites", isAuth, async (req, res) => {
 
     if (favBlocks.includes(blockName)) {
       user.favoriteBlocks = favBlocks.filter(favBlock => favBlock !== blockName);
-      console.log(user.favoriteBlocks);
     } else {
       user.favoriteBlocks.push(blockName);
-      console.log(user.favoriteBlocks);
     }
 
     await user.save();
