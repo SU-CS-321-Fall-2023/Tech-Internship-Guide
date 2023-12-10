@@ -56,19 +56,19 @@ router.get("/check-link", async (req, res) => {
   }
 });
 
-router.post('/validate-link', async(req, res) => {
-    try{
-        const response = await fetch(req?.body?.url, {
-            method: 'HEAD'
-        })
-        if (response?.status >= 200 && response?.status < 300){
-          return res.status(200).json(true)
-        }
-        res.status(404).json(false)
+router.post('/validate-link', async (req, res) => {
+  try {
+    const response = await fetch(req?.body?.url, {
+      method: 'HEAD'
+    })
+    if (response?.status >= 200 && response?.status < 300) {
+      return res.status(200).json(true)
     }
-    catch(err){
-        res.status(400).json({error: err})
-    }
+    res.status(404).json(false)
+  }
+  catch (err) {
+    res.status(400).json({ error: err })
+  }
 })
 
 router.get("/faqs", async (req, res) => {
@@ -125,7 +125,7 @@ router.post("/signin", async (req, res) => {
       req.session.userId = user?._id;
       req.session.userEmail = req?.body?.email;
       req.session.user = user;
-      return res.status(200).json({ message: "Valid user", access: true});
+      return res.status(200).json({ message: "Valid user", access: true });
     }
     res.json({ message: "Invalid Password", access: false });
   } catch (err) {
@@ -177,43 +177,51 @@ router.post("/blockData", async (req, res) => {
     res.status(400).json(err);
   }
 });
-
 router.patch("/favorites", isAuth, async (req, res) => {
-  try{
-    const user = await userModel.findOne({email: req?.session?.userEmail})
-    const favBlocks = user.favoriteBlocks
-    if (!favBlocks.includes(req?.body?.blockName)){
-      favBlocks.push(req?.body?.blockName)
+  try {
+    const user = await userModel.findOne({ email: req?.session?.userEmail });
+    const favBlocks = user.favoriteBlocks;
+    const blockName = req?.body?.blockId;
+    console.log(blockName);
+
+    if (favBlocks.includes(blockName)) {
+      user.favoriteBlocks = favBlocks.filter(favBlock => favBlock !== blockName);
+      console.log(user.favoriteBlocks);
+    } else {
+      user.favoriteBlocks.push(blockName);
+      console.log(user.favoriteBlocks);
     }
-    await user.updateOne({favoriteBlocks: favBlocks})
-    res.status(200).json('Favorite blocks updated!')
+
+    await user.save();
+    res.status(200).json('Favorite blocks updated!');
   }
-  catch(err){
-    res.json(err)
+  catch (err) {
+    res.status(500).json(err);
   }
 });
 
-router.delete("/favorites/:blockName", isAuth ,async(req, res) => {
-  try{
-    const user = await userModel.findOne({email: req?.session?.userEmail})
+
+router.delete("/favorites/:blockName", isAuth, async (req, res) => {
+  try {
+    const user = await userModel.findOne({ email: req?.session?.userEmail })
     const favBlocks = user.favoriteBlocks
-    if (favBlocks.includes(req?.params?.blockName)){
+    if (favBlocks.includes(req?.params?.blockName)) {
       favBlocks.pop(req?.params?.blockName)
     }
-    await user.updateOne({favoriteBlocks: favBlocks})
+    await user.updateOne({ favoriteBlocks: favBlocks })
     res.status(200).json('Favorite blocks updated!')
   }
-  catch(err){
+  catch (err) {
     res.json(err)
   }
 })
 
-router.get("/favorites", isAuth ,async(req, res) => {
-  try{
-    const user = await userModel.findOne({email: req?.session?.userEmail})
+router.get("/favorites", isAuth, async (req, res) => {
+  try {
+    const user = await userModel.findOne({ email: req?.session?.userEmail })
     res.status(200).json(user.favoriteBlocks)
   }
-  catch(err){
+  catch (err) {
     res.status(400).json(err)
   }
 })
@@ -254,141 +262,141 @@ router.post("/resume", (req, res) => {
 });
 
 router.get('/posts', async (req, res) => {
-    try {
-      const posts = await Post.find()
-        .sort({ createdAt: -1 })
-        .populate({
-          path: 'user',
-          model: 'users',
-          select: 'firstName email',
-        })
-        .populate({
-          path: 'replies.userId',
-          model: 'users',
-          select: 'firstName email', // Add any other fields you want to select
-        });
-  
-      res.json(posts);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  
-  
+  try {
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'user',
+        model: 'users',
+        select: 'firstName email',
+      })
+      .populate({
+        path: 'replies.userId',
+        model: 'users',
+        select: 'firstName email', // Add any other fields you want to select
+      });
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 router.post('/post', isAuth, async (req, res) => {
-    try {  
-      const { content } = req.body;
-      const userId = req.session.user._id;
-      const newPost = new Post({
-        content,
-        user: userId,
-      });
-      const savedPost = await newPost.save();
-      res.json(savedPost);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  router.post('/post/:postId/replies',isAuth,  async (req, res) => {
-    try {
-      const { content } = req.body;
-      const postId = req.params.postId;
-      const userId = req.session.user._id;
-      const post = await Post.findById(postId);
-      if (!post) {
-        return res.status(404).json({ message: 'Post not found' });
-      }
-      post.replies.push({
-        content,
-        userId,
-      });
-      const updatedPost = await post.save();
-      res.json(updatedPost);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  router.patch('/post/:postId/likes', async (req, res) => {
-    try {
-      const postId = req.params.postId;
-      const userId = req.session.user._id;
-      const post = await Post.findById(postId);
-  
-      if (!post) {
-        return res.status(404).json({ message: 'Post not found' });
-      }
-  
-      const stringifiedUserIds = post.likes.map(id => id.toString());
-      const hasLiked = stringifiedUserIds.includes(userId.toString());
-      if (hasLiked) {
-        post.likes = post.likes.filter(id => id.toString() !== userId.toString());
-      } else {
-        post.likes.push(userId);
-      }
-  
-      const updatedPost = await post.save();
-      res.json(updatedPost);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  
-
-    router.patch('/post/:postId/replies/:replyId/likes', async (req, res) => {
-        try {
-        const { postId, replyId } = req.params;
-        const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-        const reply = post.replies.id(replyId);
-        if (!reply) {
-            return res.status(404).json({ message: 'Reply not found' });
-        }
-        reply.likes++;
-        const updatedPost = await post.save();
-        res.json(updatedPost);
-        } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-        }
+  try {
+    const { content } = req.body;
+    const userId = req.session.user._id;
+    const newPost = new Post({
+      content,
+      user: userId,
     });
-
-    router.delete('/posts/:postId', async (req, res) => {
-        try {
-        const postId = req.params.postId;
-        const deletedPost = await Post.findByIdAndDelete(postId);
-        res.json(deletedPost);
-        } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-        }
+    const savedPost = await newPost.save();
+    res.json(savedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.post('/post/:postId/replies', isAuth, async (req, res) => {
+  try {
+    const { content } = req.body;
+    const postId = req.params.postId;
+    const userId = req.session.user._id;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    post.replies.push({
+      content,
+      userId,
     });
+    const updatedPost = await post.save();
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+router.patch('/post/:postId/likes', async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const userId = req.session.user._id;
+    const post = await Post.findById(postId);
 
-    router.delete('/posts/:postId/replies/:replyId', async (req, res) => {
-        try {
-        const { postId, replyId } = req.params;
-        const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-        const reply = post.replies.id(replyId);
-        if (!reply) {
-            return res.status(404).json({ message: 'Reply not found' });
-        }
-        reply.remove();
-        const updatedPost = await post.save();
-        res.json(updatedPost);
-        } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-        }
-    });
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const stringifiedUserIds = post.likes.map(id => id.toString());
+    const hasLiked = stringifiedUserIds.includes(userId.toString());
+    if (hasLiked) {
+      post.likes = post.likes.filter(id => id.toString() !== userId.toString());
+    } else {
+      post.likes.push(userId);
+    }
+
+    const updatedPost = await post.save();
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+router.patch('/post/:postId/replies/:replyId/likes', async (req, res) => {
+  try {
+    const { postId, replyId } = req.params;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const reply = post.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: 'Reply not found' });
+    }
+    reply.likes++;
+    const updatedPost = await post.save();
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.delete('/posts/:postId', async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const deletedPost = await Post.findByIdAndDelete(postId);
+    res.json(deletedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+router.delete('/posts/:postId/replies/:replyId', async (req, res) => {
+  try {
+    const { postId, replyId } = req.params;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const reply = post.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: 'Reply not found' });
+    }
+    reply.remove();
+    const updatedPost = await post.save();
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 router.get("/test", async (req, res) => {
